@@ -50,4 +50,14 @@ public class ComunicacaoService {
         return (converter.paraDTO(entity));
     }
 
+    public ComunicacaoOutDTO marcarComoEnviada(String emailDestinatario) {
+        ComunicacaoEntity entity = repository.findByEmailDestinatario(emailDestinatario);
+        if (Objects.isNull(entity)) {
+            throw new RuntimeException();
+        }
+        entity.setStatusEnvio(StatusEnvioEnum.ENVIADO);   // a única diferença do cancelar
+        repository.save(entity);
+        return converter.paraDTO(entity);
+    }
+
 }
