@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 @Service
+
 public class ComunicacaoService {
 
     private final ComunicacaoRepository repository;
