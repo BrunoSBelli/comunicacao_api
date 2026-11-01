@@ -5,6 +5,8 @@ import com.luizalebs.comunicacao_api.api.dto.ComunicacaoOutDTO;
 import com.luizalebs.comunicacao_api.business.converter.ComunicacaoConverter;
 import com.luizalebs.comunicacao_api.infraestructure.entities.ComunicacaoEntity;
 import com.luizalebs.comunicacao_api.infraestructure.enums.StatusEnvioEnum;
+import com.luizalebs.comunicacao_api.infraestructure.exceptions.BusinessException;
+import com.luizalebs.comunicacao_api.infraestructure.exceptions.ResourceNotFoundException;
 import com.luizalebs.comunicacao_api.infraestructure.repositories.ComunicacaoRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,42 +25,39 @@ public class ComunicacaoService {
     }
 
     public ComunicacaoOutDTO agendarComunicacao(ComunicacaoInDTO dto) {
-        if (Objects.isNull(dto)) {
-            throw new RuntimeException();
+        // Sem esta checagem, o banco recusa o INSERT e o cliente recebe um 500
+        if (repository.existsByEmailDestinatario(dto.getEmailDestinatario())) {
+            throw new BusinessException(
+                    "Já existe uma comunicação para o e-mail: " + dto.getEmailDestinatario());
         }
         dto.setStatusEnvio(StatusEnvioEnum.PENDENTE);
         ComunicacaoEntity entity = converter.paraEntity(dto);
-        repository.save(entity);
-        ComunicacaoOutDTO outDTO = converter.paraDTO(entity);
-        return outDTO;
+        return converter.paraDTO(repository.save(entity));
     }
 
     public ComunicacaoOutDTO buscarStatusComunicacao(String emailDestinatario) {
-        ComunicacaoEntity entity = repository.findByEmailDestinatario(emailDestinatario);
-        if (Objects.isNull(entity)) {
-            throw new RuntimeException();
-        }
-        return converter.paraDTO(entity);
+        return converter.paraDTO(buscarPorEmail(emailDestinatario));
     }
 
     public ComunicacaoOutDTO alterarStatusComunicacao(String emailDestinatario) {
-        ComunicacaoEntity entity = repository.findByEmailDestinatario(emailDestinatario);
-        if (Objects.isNull(entity)) {
-            throw new RuntimeException();
-        }
+        ComunicacaoEntity entity = buscarPorEmail(emailDestinatario);
         entity.setStatusEnvio(StatusEnvioEnum.CANCELADO);
-        repository.save(entity);
-        return (converter.paraDTO(entity));
+        return converter.paraDTO(repository.save(entity));
     }
 
     public ComunicacaoOutDTO marcarComoEnviada(String emailDestinatario) {
+        ComunicacaoEntity entity = buscarPorEmail(emailDestinatario);
+        entity.setStatusEnvio(StatusEnvioEnum.ENVIADO);
+        return converter.paraDTO(repository.save(entity));
+    }
+
+    private ComunicacaoEntity buscarPorEmail(String emailDestinatario) {
         ComunicacaoEntity entity = repository.findByEmailDestinatario(emailDestinatario);
         if (Objects.isNull(entity)) {
-            throw new RuntimeException();
+            throw new ResourceNotFoundException(
+                    "Comunicação não encontrada para o e-mail: " + emailDestinatario);
         }
-        entity.setStatusEnvio(StatusEnvioEnum.ENVIADO);   // a única diferença do cancelar
-        repository.save(entity);
-        return converter.paraDTO(entity);
+        return entity;
     }
 
 }

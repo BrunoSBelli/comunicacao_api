@@ -4,8 +4,8 @@ import com.luizalebs.comunicacao_api.api.dto.ComunicacaoOutDTO;
 import com.luizalebs.comunicacao_api.api.dto.EmailRequestDTO;
 import com.luizalebs.comunicacao_api.business.converter.ComunicacaoConverter;
 import com.luizalebs.comunicacao_api.infraestructure.client.NotificacaoClient;
-import com.luizalebs.comunicacao_api.infraestructure.entities.ComunicacaoEntity;
 import com.luizalebs.comunicacao_api.infraestructure.enums.StatusEnvioEnum;
+import com.luizalebs.comunicacao_api.infraestructure.exceptions.BusinessException;
 import com.luizalebs.comunicacao_api.infraestructure.repositories.ComunicacaoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,13 +45,12 @@ public class NotificacaoService {
 
     private void validarStatusParaEnvio(StatusEnvioEnum status) {
         if (status == StatusEnvioEnum.CANCELADO) {
-            throw new IllegalStateException("Comunicação cancelada: o e-mail não foi enviado.");
+            throw new BusinessException("Comunicação cancelada: o e-mail não foi enviado.");
         }
         if (status == StatusEnvioEnum.ENVIADO) {
-            throw new IllegalStateException("Esta comunicação já foi enviada.");
+            throw new BusinessException("Esta comunicação já foi enviada.");
         }
     }
-
 
         private LocalDateTime converterData(Date data) {
         if (data == null) {
