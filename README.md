@@ -23,3 +23,25 @@ de envio e cancelar comunicações.
 
 - **PATCH /comunicacao/cancelar?emailDestinatario={email}**: Altera o status da
   comunicação para `CANCELADO`.
+
+## Como executar com Docker
+
+1. Copie `.env.example` para `.env` e defina a senha do banco.
+2. Execute:
+   ```bash
+   docker compose up --build
+   ```
+3. Acesse o Swagger em http://localhost:8080/swagger-ui/index.html
+
+Observação: o envio de e-mail depende da API de notificação, que deve estar
+rodando em http://localhost:8082.
+
+## Melhorias realizadas
+
+- [x] Documentação dos endpoints
+- [x] Swagger/OpenAPI
+- [x] Integração com a API de notificação (Feign)
+- [x] MapStruct na conversão DTO ↔ Entity
+- [x] GlobalExceptionHandler
+- [x] Docker e Docker Compose
+- [ ] Testes unitários (Controller e Service)
