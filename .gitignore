@@ -1,0 +1,12 @@
+# Senhas e configurações locais (NUNCA versionar)
+.env
+
+# Build do Maven
+target/
+
+# IntelliJ
+.idea/
+*.iml
+
+# Outros
+HELP.md

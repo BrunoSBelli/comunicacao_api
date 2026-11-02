@@ -1,0 +1,38 @@
+services:
+
+  # ----- Banco de dados -----
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: comunicacao_api
+    ports:
+      # 3307 no PC -> 3306 no container.
+      - "3307:3306"
+    volumes:
+      # Guarda os dados fora do container (sobrevivem a um "down")
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      # Só considera o banco "pronto" quando ele responde de verdade
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/comunicacao_api
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      NOTIFICACAO_URL: http://host.docker.internal:8082
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
