@@ -1,36 +1,20 @@
 package com.luizalebs.comunicacao_api.business.converter;
 
+
 import com.luizalebs.comunicacao_api.api.dto.ComunicacaoInDTO;
 import com.luizalebs.comunicacao_api.api.dto.ComunicacaoOutDTO;
 import com.luizalebs.comunicacao_api.infraestructure.entities.ComunicacaoEntity;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@AllArgsConstructor
-@Component
-public class ComunicacaoConverter {
 
-    public ComunicacaoEntity paraEntity(ComunicacaoInDTO dto) {
-        return ComunicacaoEntity.builder()
-                .dataHoraenvio(dto.getDataHoraEnvio())
-                .emailDestinatario(dto.getEmailDestinatario())
-                .nomeDestinatario(dto.getNomeDestinatario())
-                .mensagem(dto.getMensagem())
-                .modoDeEnvio(dto.getModoDeEnvio())
-                .statusEnvio(dto.getStatusEnvio())
-                .telefoneDestinatario(dto.getTelefoneDestinatario())
-                .build();
-    }
+@Mapper(componentModel = "spring")
+public interface ComunicacaoConverter {
 
-    public ComunicacaoOutDTO paraDTO(ComunicacaoEntity entity) {
-        return ComunicacaoOutDTO.builder()
-                .dataHoraEnvio(entity.getDataHoraenvio())
-                .emailDestinatario(entity.getEmailDestinatario())
-                .nomeDestinatario(entity.getNomeDestinatario())
-                .mensagem(entity.getMensagem())
-                .modoDeEnvio(entity.getModoDeEnvio())
-                .telefoneDestinatario(entity.getTelefoneDestinatario())
-                .statusEnvio(entity.getStatusEnvio())
-                .build();
-    }
+    @Mapping(source = "dataHoraEnvio", target = "dataHoraenvio")
+    ComunicacaoEntity paraEntity(ComunicacaoInDTO dto);
+
+    @Mapping(source = "dataHoraenvio", target = "dataHoraEnvio")
+    ComunicacaoOutDTO paraDTO(ComunicacaoEntity entity);
+
 }
